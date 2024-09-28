@@ -1,10 +1,8 @@
-import { Request, Response } from 'express';
-
 import httpStatus from 'http-status';
-
 import { catchAsync } from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { MeilisearchServices } from './meilisearch.services';
+import { Request, Response } from 'express';
 
 const getItemsFromMeili = catchAsync(async (req: Request, res: Response) => {
   const { searchTerm, limit } = req.query;
@@ -19,7 +17,7 @@ const getItemsFromMeili = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Items Retrieved Successfully',
+    message: 'Items Retrived Successfully',
     data: result,
   });
 });
