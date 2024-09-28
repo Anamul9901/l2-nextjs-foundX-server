@@ -1,10 +1,14 @@
 import { QueryBuilder } from '../../builder/QueryBuilder';
 import { TImageFiles } from '../../interfaces/image.interface';
+import meiliClient, {
+  addDocumentToIndex,
+  deleteDocumentFromIndex,
+} from '../../utils/meilisearch';
 // import {
 //   addDocumentToIndex,
 //   deleteDocumentFromIndex,
 // } from '../../utils/meilisearch';
-import { ItemsSearchableFields } from './item.constant';
+import { ItemsSearchableFields, noImage } from './item.constant';
 import { TItem } from './item.interface';
 import { Item } from './item.model';
 import {
@@ -18,7 +22,20 @@ const createItemIntoDB = async (payload: TItem, images: TImageFiles) => {
 
   const result = await Item.create(payload);
 
+  //* meilisearch start
+  const { _id, title, description, images: meiliImages } = result;
+  await meiliClient.index('items').addDocuments([
+    {
+      _id: _id.toString(),
+      title,
+      description,
+      images: meiliImages?.[0] || noImage,
+    },
+  ]);
+
   // await addDocumentToIndex(result, 'items');
+  //* meilisearch end
+
   return result;
 };
 
@@ -62,10 +79,11 @@ const updateItemInDB = async (itemId: string, payload: TItem) => {
 
 const deleteItemFromDB = async (itemId: string) => {
   const result = await Item.findByIdAndDelete(itemId);
-  // const deletedItemId = result?._id;
-  // if (deletedItemId) {
-  //   await deleteDocumentFromIndex('items', deletedItemId.toString());
-  // }
+
+  const deletedItemId = result?._id;
+  if (deletedItemId) {
+    await deleteDocumentFromIndex('items', deletedItemId.toString());
+  }
   return result;
 };
 

@@ -1,4 +1,4 @@
-import meiliClient from '../../utils/meilisearch';
+import meiliClient from '../../utils/meilisearch_';
 
 const getAllItems = async (limit: number, searchTerm?: string) => {
   const index = meiliClient?.index('items');
